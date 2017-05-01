@@ -1,0 +1,26 @@
+<%- include('../partials/header') -%>
+
+<h2 class="ui header">
+  <i class="comments outline icon"></i>
+  <div class="content"><%= writers[0].name %> 님의 질문
+  </div>
+</h2>
+
+
+<% if(typeof(writers[0].questions[0]) !== "undefined"){ %>
+  <% writers[0].questions.forEach(function(question){ %>
+    <a class="ui fluid card" href="/pages/<%= question.page.id %>/questions/<%= question.id %>">
+      <div class="content">
+        <img class="left floated mini ui image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg">
+        <div class="header"><%= question.writer.name %></div>
+        <div class="meta"><%= moment(question.created_at).fromNow(); %></div>
+        <div class="description"><%= question.content %></div>
+      </div>
+      <div class="content"><i class="comment icon"></i><%= question.comments.length %> comments</div>
+    </a>
+  <% }); %>
+<%}else{ %>
+  <h2>등록된 질문이 없습니다.</h2>
+<% } %>
+
+<%- include('../partials/footer') -%>

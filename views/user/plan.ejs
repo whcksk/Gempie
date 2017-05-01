@@ -1,0 +1,168 @@
+<%- include('../partials/header') -%>
+<h2 class="ui header">
+  <i class="calendar icon"></i>
+  <div class="content">내 일정 <div class="sub header">나만의 여행을 계획하고 공유해보세요.</div>
+  </div>
+</h2>
+<div class="ui stackable one column grid">
+  <div class="column">
+    <h3 class="ui header">일정 추가</h3>
+    <form class="ui form" method="post" action="/user/plans">
+      <div class="field" id="city-search">
+        <label>여행지</label>
+        <div class="ui icon input">
+          <input type="text" id="autocomplete" placeholder="도시 검색">
+          <i class="search icon"></i>
+        </div>
+      </div>
+      <div class="field" id="city-selected" style="display:none;">
+        <label>여행지</label>
+        <div>
+          <div class="ui fluid button" id="city-selected-button" onclick="changeCity();" data-tooltip="다시 선택" data-inverted="">도시명</div>
+          <input type="hidden" name="city_id" id="city-selected-input" required>
+        </div>
+      </div>
+      <div class="two fields">
+        <div class="field">
+          <label>시작일</label>
+          <div class="ui calendar" id="rangestart">
+            <div class="ui input left icon">
+              <i class="calendar icon"></i>
+              <input type="text" placeholder="Start" name="start_date">
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <label>종료일</label>
+          <div class="ui calendar" id="rangeend">
+            <div class="ui input left icon">
+              <i class="calendar icon"></i>
+              <input type="text" placeholder="End" name="end_date">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <label>내용</label>
+        <textarea name="content" placeholder="다른 여행 친구들에게 나의 여행 동행 계획을 알려주세요!"></textarea>
+      </div>
+      <div class="field">
+        <div class="ui toggle checkbox">
+          <input type="checkbox" name="find_companion">
+          <label>함께해요</label>
+        </div>
+      </div>
+      <button class="ui button" type="submit">일정 추가</button>
+    </form>
+  </div>
+  <div class="column">
+    <h3 class="ui header">일정 목록</h3>
+    <% plans.forEach( function(plan){ %>
+      <div class="ui fluid card" href="#" id="<%= plan._id %>">
+        <div class="content">
+          <div class="header">
+            <%= plan.city.name %> 
+            <% if (plan.find_companion) { %>
+              <span class="ui red basic label">동행구함</span>
+            <% } %>
+          </div>
+          <div class="meta"><%= plan.city.country.name %> <i class="<%= plan.city.country.code %> flag"></i></div>
+          <div class="description">
+            <%= moment(plan.start_date).format('LL') %> ~ <%= moment(plan.end_date).format('LL') %>
+          </div>
+        </div>
+        <div class="extra content">
+          <p><%= plan.content %></p>
+          <div class="ui bottom right attached label">
+            <a href="/user/plans/<%= plan._id %>/edit"><i class="pencil icon"></i></a>
+            <a href="/user/plans/<%= plan._id %>/delete"><i class="trash icon"></i></a>
+          </div>
+        </div>
+      </div>
+    <% }); %>
+
+  </div>
+</div>
+
+<script>
+$( document ).ready(function() {
+  $('#city-selected-button')
+    .popup()
+  ;
+  
+  $('#rangestart').calendar({
+    type: 'date',
+    formatter: {
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day;
+      }
+    },
+    endCalendar: $('#rangeend')
+  });
+  $('#rangeend').calendar({
+    type: 'date',
+    formatter: {
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day;
+      }
+    },
+    startCalendar: $('#rangestart')
+  });
+});
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnhXCqLbWgRR84ciGzGJ4z9wL-MQsPBok&language=ko&libraries=places&callback=initAutocomplete" async defer></script>
+<script>
+// This example displays an address form, using the autocomplete feature
+// of the Google Places API to help users fill in the information.
+
+var autocomplete;
+
+function initAutocomplete() {
+  // Create the autocomplete object, restricting the search to geographical
+  // location types.
+  autocomplete = new google.maps.places.Autocomplete((document.getElementById('autocomplete')), {types: ['(cities)']});
+
+  // When the user selects an address from the dropdown, populate the address
+  // fields in the form.
+  autocomplete.addListener('place_changed', fillInAddress);
+}
+
+// [START region_fillform]
+function fillInAddress() {
+  // Get the place details from the autocomplete object.
+  var place = autocomplete.getPlace();
+  $("#city-search").css("display", "none");
+  $("#city-selected-button").text(place.name);
+  $("#city-selected-input").val(place.place_id);
+  $("#city-selected").css("display", "block");
+}
+
+function changeCity() {
+  $('#autocomplete').val("");
+  $("#city-search").css("display", "block");
+  $("#city-selected").css("display", "none");
+  $("#city-selected-button").text("");
+  $("#city-selected-input").val("");
+}
+
+// function editPlan(){
+  
+// }
+
+// function deletePlan(plan_id){
+//   var result = confirm("Want to delete?");
+//   if (result){
+//     document.location.href = "/user/plans/plan_id/delete";
+//   }
+// }
+</script>
+<%- include('../partials/footer') -%>

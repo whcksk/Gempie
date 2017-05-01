@@ -1,0 +1,15 @@
+<%- include('../partials/header') -%>
+<%- include('../partials/errors') -%>
+
+<h2 class="ui dividing header">페이지 만들기</h1>
+<form class="ui form" action="/pages/makepage" method="post">
+  <div class="field">
+    <label>페이지 이름:</label>
+    <input type="text" name="page_name" placeholder="페이지 이름" required>
+  </div>
+  <div class="field">
+    <button class="ui inverted violet button" type="submit">만들기</button>
+  </div>
+</form>
+
+<%- include('../partials/footer') -%>

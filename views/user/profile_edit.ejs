@@ -1,0 +1,31 @@
+<%- include('../partials/header') -%>
+<h2 class="ui header">
+  <i class="user icon"></i>
+  <div class="content">
+    <%= user.name %>의 페이지 <div class="sub header">내 페이지</div>
+  </div>
+</h2>
+
+<%- include('../partials/errors') -%>
+
+<form class="ui form" method="post" action="/user/profile">
+  <h4 class="ui dividing header">프로필 수정하기</h4>
+  <div class="field">
+    <label>이름</label>
+    <div class="field">
+      <input type="text" name="name" placeholder="이름" value="<%= user.name %>" required>
+    </div>
+    <label>이메일</label>
+    <div class="field">
+      <input type="email" name="email" placeholder="이메일" value="<%= user.email %>">
+    </div>
+    <label>자기소개</label>
+    <div class="field">
+      <textarea row="2" name="intro" placeholder="자기를 표현해주세요."><%= user.intro %></textarea>
+    </div>
+  </div>
+  <input type="submit" class="ui positive button" value="수정">
+  <a class="ui cancel button" href="/user/profile">취소</a>
+</form>
+
+<%- include('../partials/footer') -%>

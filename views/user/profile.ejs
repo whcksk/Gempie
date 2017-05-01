@@ -1,0 +1,99 @@
+<%- include('../partials/header') -%>
+<h2 class="ui header">
+  <i class="user icon"></i>
+  <div class="content">
+    <%= user.name %>의 페이지 <div class="sub header">내 페이지</div>
+  </div>
+</h2>
+
+<div class="ui segments">
+  <div class="ui segment">
+    <div class="ui divided items">
+      <div class="item">
+        <div class="image">
+          <img src="http://semantic-ui.com/images/avatar2/small/elyse.png">
+        </div>
+        <div class="content">
+          <a class="header"><%= user.name %></a>
+          <div class="meta">
+            <span class="cinema"><%= user.username %></span>
+          </div>
+          <div class="ui list">
+            <div class="item">
+              <i class="marker icon"></i>
+              <div class="content">
+                New York, NY
+              </div>
+            </div>
+            <div class="item">
+              <i class="mail icon"></i>
+              <div class="content">
+                <% if (user.email) { %>
+                <a href="mailto:<%= user.email %>"><%= user.email %></a>
+                <% } %>
+              </div>
+            </div>
+            <div class="item">
+              <i class="linkify icon"></i>
+              <div class="content">
+                <a href="http://www.semantic-ui.com">semantic-ui.com</a>
+              </div>
+            </div>
+          </div>
+          <div class="extra">
+            <div class="ui label"><i class="us flag"></i>NewYork</div>
+            <div class="ui label"><i class="gb flag"></i>London</div>
+          </div>
+          <a class="ui bottom right attached label" href="/user/profile/edit">프로필 수정</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui segment">
+    <div class="ui items">
+      <div class="item">
+        <div class="content">
+          <div class="header">자기소개</div>
+          <div class="description">
+            <% if (user.intro) {%>
+            <p><%- user.intro.replace(/\n/g, '<br>') %></p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui segment">
+    <div class="ui items">
+      <div class="item">
+        <div class="content">
+          <div class="header">같이 동행했던 친구들</div>
+        </div>
+      </div>
+      <div class="item">
+        <a class="ui tiny image">
+          <img src="http://semantic-ui.com/images/avatar/large/jenny.jpg">
+        </a>
+        <div class="middle aligned content">
+          <div class="header">
+            <i class="like icon"></i>
+            Veronika Ossi
+          </div>
+        </div>
+      </div>
+      <div class="item">
+        <a class="ui tiny image">
+          <img src="http://semantic-ui.com/images/avatar/large/justen.jpg">
+        </a>
+        <div class="middle aligned content">
+          <div class="header">
+            <i class="favorite icon"></i>
+            Justen Kitsune
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') -%>

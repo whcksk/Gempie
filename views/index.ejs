@@ -1,0 +1,30 @@
+<%- include('partials/header') -%>
+
+<div class="ui fluid icon input locationField">
+  <input type="text" id="autocomplete" placeholder="질문 검색">
+  <i class="search icon"></i>
+</div>
+
+<h1 class="ui header">메인</h1>
+
+<form class="ui form" method="post" action="/pages/0/question">
+<div class="ui fluid action input">
+    <input type="text" name="content" placeholder="질문 작성...">
+    <button class="ui submit button">올리기</button>
+</div>
+</form>
+
+<h3 class="ui header">최근 질문</h3>
+<% questions.forEach(function(question){ %>
+  <a class="ui fluid card" href="/pages/<%= question.page.id %>/questions/<%= question.id %>">
+    <div class="content">
+      <img class="left floated mini ui image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg">
+      <div class="header"><%= question.writer.name %></div>
+      <div class="meta"><%= moment(question.created_at).fromNow(); %></div>
+      <div class="description"><%= question.content %></div>
+    </div>
+    <div class="content"><i class="comment icon"></i><%= question.comments.length %> comments</div>
+  </a>
+<% }); %>
+
+<%- include('partials/footer') -%>

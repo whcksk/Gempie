@@ -1,0 +1,112 @@
+<%- include('../partials/header-city') -%>
+
+<h2 class="ui header">
+  <i class="users icon"></i>
+  <div class="content"><%= city.name %> 여행자 <div class="sub header"><%= city.name %>에서의 여행 계획을 공유하세요.</div>
+  </div>
+</h2>
+
+<a class="ui blue labeled icon button" href="/user/plans"><i class="icon edit"></i>일정 만들기 </a>
+
+
+<h3>여행자 찾기</h3>
+<form class="ui form" method="get" action="">
+  <div class="two fields">
+    <div class="field">
+      <label>시작일</label>
+      <div class="ui calendar" id="rangestart">
+        <div class="ui input left icon">
+          <i class="calendar icon"></i>
+          <input type="text" placeholder="Start" name="start_date">
+        </div>
+      </div>
+    </div>
+    <div class="field">
+      <label>종료일</label>
+      <div class="ui calendar" id="rangeend">
+        <div class="ui input left icon">
+          <i class="calendar icon"></i>
+          <input type="text" placeholder="End" name="end_date">
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="ui button" type="submit">일정 검색</button>
+</form>
+
+<% if (typeof myPlans != 'undefined') { %>
+<h3>내 일정</h3>
+<% myPlans.forEach(function(plan) { %>
+<a class="ui basic label" href="/cities/<%= city.id %>/travelers?start_date=<%= moment(plan.start_date).format('YYYY-MM-DD') %>&end_date=<%= moment(plan.end_date).format('YYYY-MM-DD') %>"><%= moment(plan.start_date).format('L')%> ~ <%= moment(plan.end_date).format('L') %></a>
+<% }); %>
+<% } %>
+
+
+<% if (typeof end_date == 'undefined') { %>
+  <h3><%= moment(start_date).format('LL') %> 여행 일정</h3>
+<% } else { %>
+  <h3><%= moment(start_date).format('LL') %>부터 <%= moment(end_date).format('LL') %>까지 여행 일정</h3>
+<% } %>
+<table class="ui selectable celled table">
+  <thead>
+    <tr>
+      <th>여행자</th>
+      <th>시작일</th>
+      <th>종료일</th>
+      <th>일치</th>
+      <th>동행</th>
+    </tr>
+  </thead>
+  <tbody>
+<% plans.forEach(function(plan) { %>
+    <tr onclick="location.href='/travelers/<%= plan.traveler.username %>'">
+      <td><i class="user icon"></i> <%= plan.traveler.name %></td>
+      <td><%= moment(plan.start_date).format('LL') %></td>
+      <td><%= moment(plan.end_date).format('LL') %></td>
+      <td><%= plan.intersect %>일</td>
+      <td>
+        <% if (plan.find_companion) { %>
+          찾는중
+        <% } %>
+      </td>
+    </tr>
+<% }); %>
+  </tbody>
+</table>
+
+<script>
+$( document ).ready(function() {
+  $('#city-selected-button')
+    .popup()
+  ;
+  
+  $('#rangestart').calendar({
+    type: 'date',
+    formatter: {
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day;
+      }
+    },
+    endCalendar: $('#rangeend')
+  });
+  $('#rangeend').calendar({
+    type: 'date',
+    formatter: {
+      date: function (date, settings) {
+        if (!date) return '';
+        var day = date.getDate();
+        var month = date.getMonth() + 1;
+        var year = date.getFullYear();
+        return year + '-' + month + '-' + day;
+      }
+    },
+    startCalendar: $('#rangestart')
+  });
+});
+</script>
+
+<%- include('../partials/footer') -%>

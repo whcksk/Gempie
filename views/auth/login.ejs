@@ -1,0 +1,19 @@
+<%- include('../partials/header') -%>
+<h2 class="ui dividing header">Login</h1>
+<form class="ui form" action="/auth/login" method="post">
+  <div class="field">
+    <label>Username:</label>
+    <input type="text" name="username" placeholder="username">
+  </div>
+  <div class="field">
+    <label>Password:</label>
+    <input type="password" name="password" placeholder="********">
+  </div>
+  <div class="field">
+    <button class="ui button" type="submit">Sign In</button>
+    <a class="ui blue inverted button" href="/auth/signup">Sign Up</a>
+  </div>
+</form>
+
+
+<%- include('../partials/footer') -%>

@@ -1,0 +1,22 @@
+<%- include('../partials/header') -%>
+
+<h2 class="ui header">질문</h2>
+
+<div class="ui fluid card">
+  <div class="content">
+    <img class="left floated mini ui image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg">
+    <div class="header"><%= question.writer.name %></div>
+    <div class="meta"><%= moment(question.created_at).fromNow(); %></div>
+    <form class="ui form" method="post" action="/pages/<%= page.id %>/questions/<%= question.id %>/edit">
+      <div class="field">
+        <textarea name="content"><%= question.content %></textarea>
+      </div>
+      <div class="ui bottom">
+        <button class="ui teal submit button" type="submit">Update</button>
+        <a class="ui button" href="/pages/<%= page.id %>/questions/<%= question.id %>">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') -%>

@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>TravelWith</title>
+	
+	<!-- stylesheet -->
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/semantic-ui/2.2.6/semantic.min.css">
+	<link rel="stylesheet" href="/bower_components/semantic-ui-calendar/dist/calendar.min.css" />
+	<link rel='stylesheet' href='/stylesheets/style.css' />
+	
+	<!-- javascript -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/semantic-ui/2.2.4/semantic.min.js"></script>
+	<script type="text/javascript" src="/bower_components/semantic-ui-calendar/dist/calendar.min.js"></script>
+</head>
+<body>
+<div class="ui container">
+<header>
+	<% if (!user) { %>
+		<div class="ui celled horizontal list">
+			<div class="item"><a href="/">홈</a></div>
+			<div class="item"><a href="/auth/login">로그인</a></div>
+			<div class="item"><a href="/auth/signup">회원가입</a></div>
+		</div>
+	<% } else { %>
+		<div class="ui celled horizontal list">
+			<div class="item"><a href="/">홈</a></div>
+			<div class="item"><i class="user icon"></i> <%= user.name %></a></div>
+			<div class="item"><a href="/travelers/<%= user.username %>">내 일정</a></div>
+			<div class="item"><a href="/auth/logout">로그아웃</a></div>
+		</div>
+	<% } %>
+</header>
+
+<%- messages('partials/messages', locals) %>
+<!-- opacity: 0.5; -->
+<style type="text/css">
+	body{
+		/*background-image: url('/images/10.jpg');*/
+	}
+</style>
+<script src="/socket.io/socket.io.js"></script>
+<div style="display: flex; width: 100%;">
+	<aside style="flex : 1;left:0px; border: 1px;overflow: auto; margin: 20px; ">
+		<div class="ui vertical menu" id="citySet" style="margin-right: 0px; ">
+			<button id="load">Loading</button>
+			<div class="item" style="padding-bottom: 20px">
+				<div class="ui input"><input type="text" id="autocomplete" placeholder="Search..."></div>
+			</div>
+
+		</div>	
+	</aside>
+	<div style="flex :3;">
+		
+		<div class="ui basic segment">
+			<h3 class="ui header">도시</h3>
+			<div class="chat-app">
+
+			<!--scroll 넣었고, height 500px로 고정. <이거 height: 100%로 하고 min-height 설정하는게 낫지 않나 ? -->
+				<div class="ui comments" id="chatview" style="height:60vh; background-color: whitesmoke; overflow-y: scroll;">
+          			<!-- here -->
+					<!--<div class="comment">-->
+					<!--	<a class="avatar">-->
+					<!--		<img src="http://semantic-ui.com/images/avatar/small/stevie.jpg">-->
+					<!--	</a>-->
+					<!--	<div class="content">-->
+					<!--		<a class="author">aaaa</a>-->
+					<!--		<div class="metadata">-->
+					<!--			<div class="date">2222</div>-->
+					<!--		</div>-->
+					<!--		<div class="text">cccccc</div>-->
+					<!--	</div>-->
+					<!--</div>-->
+					<!-- here -->
+				</div>
+				<!-- <div class="ui comments" id="chatview">
+
+					<div class="comment">
+						<a class="avatar">
+							<img src="http://semantic-ui.com/images/avatar/small/stevie.jpg">
+						</a>
+						<div class="content">
+							<a class="author">aaaa</a>
+							<div class="metadata">
+								<div class="date">2222</div>
+							</div>
+							<div class="text">cccccc</div>
+						</div>
+					</div>
+
+				</div> -->
+
+
+				<form onsubmit="return false;" style="height: 10%;">
+					<div class="ui form">
+						<div class="field">
+							<textarea rows="1" class="chat-input__text-area" id="chatmsg" placeholder="내용..."></textarea>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div style="flex :1;">
+		<div class="ui styled accordion" onclick="requestPops()" style="width: 100%">
+			<div class="title">
+				<i class="dropdown icon"></i>
+				Show Participants
+			</div>
+			<div class="content">
+				<div class="transition hidden" id="participants">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<!-- 
+<div class="ui vertical menu">
+	<div class="item">
+		<div class="ui input"><input type="text" placeholder="Search..."></div>
+	</div>
+
+	<div class="item">
+		Home
+		<div class="menu">
+			<a class="active item">Search</a>
+			<a class="item">Add</a>
+			<a class="item">Remove</a>
+		</div>
+	</div>
+	<a class="item">
+		<i class="grid layout icon"></i> Browse
+	</a>
+	<a class="item">
+		Messages
+	</a>
+	<div class="ui dropdown item">
+		More
+		<i class="dropdown icon"></i>
+			<div class="menu">
+				<a class="item"><i class="edit icon"></i> Edit Profile</a>
+				<a class="item"><i class="globe icon"></i> Choose Language</a>
+				<a class="item"><i class="settings icon"></i> Account Settings</a>
+			</div>
+		</div>
+	</div>
+<div>
+	
+</div> -->
+
+<script type="text/javascript">
+	var socket;
+	$(function(){
+		$('.ui.accordion').accordion();
+		socket = io();
+		socket.viewflag = 1;
+		socket.on('connect', function(){
+			socket.emit('addUser', '<%= user.name %>', '<%= city.name %>', '<%= city.id %>');
+		});
+		socket.on('chatEmit', function (chat_user, data) {
+			var ch = data.replace(new RegExp('\n','gi'), '<br/>');
+			if(chat_user == 'SERVER'){ // SERVER
+				$('#chatview').append(`
+					<div class="ui visible message">
+						<p><STRONG>SERVER</STRONG> : `+ ch +` </p>
+					</div>`);
+			}else if(chat_user === '<%= user.name %>'){ // me
+			
+				$('#chatview').append(`
+					<div class="comment">
+						<a class="avatar">
+							<img src="http://semantic-ui.com/images/avatar/small/stevie.jpg">
+						</a>
+						<div class="content">
+							<a class="author">`+ chat_user +`</a>
+							<div class="metadata">
+								<div class="date">`+ Date.now() +`</div>
+							</div>
+							<div class="text">`+ ch +`</div>
+						</div>
+					</div>`);	
+			}else{	// Others
+			
+				$('#chatview').append(`
+					<div class="comment">
+						<a class="avatar">
+							<img src="http://semantic-ui.com/images/avatar/small/stevie.jpg">
+						</a>
+						<div class="content">
+							<a class="author">`+ chat_user +`</a>
+							<div class="metadata">
+								<div class="date">`+ Date.now() +`</div>
+							</div>
+							<div class="text">`+ ch +`</div>
+						</div>
+					</div>`);	
+
+			}
+			if(socket.viewflag == 1){	// 채팅중이라면
+				$('#chatview').scrollTop(99999999999);	// 스크롤 내려준다.
+			}
+			// if(chat_user === '<%= user.name %>')
+			
+			// else
+			//	 $('#chatview').append('<div style="width: 100%;text-align: left"><b>'+chat_user + ':</b> ' + data + '<br></div>');
+		});
+		socket.on('updateCityList', function(cityList){
+			var setView = $('#citySet');
+			setView.children(".updateList").detach();
+			for(var each in cityList){
+				if(cityList[each][0] != null){
+					setView.append(`
+						<a href="/cities/`+ cityList[each][2] +`/chats" class="item updateList">
+							<div style="text-align: left;"><h3>` + cityList[each][0] + `</h3></div>
+							<div style="text-align: right">` + cityList[each][1] + `명</div>
+						</a>`);
+				}
+				// console.log(cityList[each]+'bbb');	
+			};
+			
+			// 도시 list 최신화 
+			// jQuery 로 #citySet 에 
+			// <a class="item">
+			// 	<div style="text-align: left;"><h3>서울</h3></div>
+			// 	<div style="text-align: right">1000명</div>
+			// </a>
+			// 추가하기 
+		});
+		socket.on('updatePopu', function(innerPop){
+
+			var setView = $('#participants');
+			setView.children().detach();
+			var innerText = '';
+			if(innerPop!=null){
+				for(var each in innerPop){
+					innerText = innerText +'<a href="#">'+innerPop[each]+'</a><br/>';
+				};
+				setView.append(innerText);
+			}
+			else{
+
+			}
+		});
+
+		socket.on('firstLoad', function(firstLD){
+			if(firstLD[0].length === 0){
+				break;
+			}else{
+				for(var i in firstLD){
+					$('#chatview').prepend(`
+					<div class="comment">
+						<a class="avatar">
+							<img src="http://semantic-ui.com/images/avatar/small/stevie.jpg">
+						</a>
+						<div class="content">
+							<a class="author">`+ firstLD[i][0] +`</a>
+							<div class="metadata">
+								<div class="date">`+ Date.now() +`</div>
+							</div>
+							<div class="text">`+ firstLD[i][1] +`</div>
+						</div>
+					</div>`);
+				}	
+			}
+			
+		});
+		
+		$('#chatmsg').keypress(function(e) {
+			socket.viewflag = 1; // 채팅중임을 표시
+			if(e.which == 13) {
+				var message = $('#chatmsg').val();
+				if(message){
+					$('#chatmsg').val("");
+					socket.emit('sendchat', message);
+					return false;
+				}
+			}else if(e.which == 10) {
+				var message = $('#chatmsg').val();
+				$('#chatmsg').val(message+'\n');
+
+			}
+		});
+		
+		
+		 
+		 
+		 /*
+		 버튼 클릭시 이전 로그 불러오기
+		 */
+		$('#load').click(function () {
+			socket.viewflag = 0;	// 채팅중이 아님을 표시
+			socket.emit('loadLog', 1);	// div id를 만들기위해 index 불러오기	// client에서 또 받아서 div 만들어 줄거다.
+		});
+		socket.on('loadLogShow', function (index, devide) {
+			if(index == -1){
+				alert('불러올 로그가 없습니다!');
+			}
+			else{
+				var loadData='';
+				var name, data, temp;
+				var divName = "#chatview" + index;
+				for (var i = 1; i < devide.length; i++) {
+					temp = devide[i].split('/:::/');
+					name = temp[0];
+					data = temp[1];
+					loadData = loadData + `
+					<div class="comment">
+						<a class="avatar">
+							<img src="http://semantic-ui.com/images/avatar/small/stevie.jpg">
+						</a>
+						<div class="content">
+							<a class="author">`+ name +`</a>
+							<div class="metadata">
+								<div class="date">`+ Date.now() +`</div>
+							</div>
+							<div class="text">`+ data +`</div>
+						</div>
+					</div>`
+				}
+				
+				alert('loading!');
+				$('#chatview').prepend(`<div id='chatview` + index + `'></div>`);
+
+				var divName = "#chatview" + index;
+				$(divName).append(loadData);
+			}
+		});      
+		 
+		 
+		 
+		
+		
+	});
+	var isPopRequest = true;	
+	function requestPops(){
+		if(isPopRequest){
+			socket.emit('requestPopu','');
+			//socket Request
+			isPopRequest = false;
+		}else{
+			isPopRequest = true;
+		}
+	}
+		
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAnhXCqLbWgRR84ciGzGJ4z9wL-MQsPBok&language=ko&libraries=places&callback=initAutocomplete" async defer></script>
+<script>
+
+var placeSearch, autocomplete;
+
+function initAutocomplete() {
+	autocomplete = new google.maps.places.Autocomplete((document.getElementById('autocomplete')), {types: ['(cities)']});
+	autocomplete.addListener('place_changed', fillInAddress);
+}
+
+// [START region_fillform]
+function fillInAddress() {
+	var place = autocomplete.getPlace();
+	window.location.href = '/cities/' + place.place_id + '/chats';
+}
+</script>
+
+
+
+<%- include('../partials/footer') -%>

@@ -1,0 +1,22 @@
+<%- include('../partials/header-city') -%>
+
+<h2 class="ui header">피드</h2>
+
+<div class="ui fluid card">
+  <div class="content">
+    <img class="left floated mini ui image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg">
+    <div class="header"><%= feed.traveler.name %></div>
+    <div class="meta"><%= moment(feed.created_at).fromNow(); %></div>
+    <form class="ui form" method="post" action="/cities/<%= city.id %>/feeds/<%= feed.id %>/edit">
+      <div class="field">
+        <textarea name="content"><%= feed.content %></textarea>
+      </div>
+      <div class="ui bottom">
+        <button class="ui teal submit button" type="submit">Update</button>
+        <a class="ui button" href="/cities/<%= city.id %>/feeds/<%= feed.id %>">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') -%>

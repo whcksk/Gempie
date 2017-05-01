@@ -1,0 +1,38 @@
+<%- include('../partials/header-city') -%>
+<h2 class="ui header">
+  <i class="comments icon"></i>
+  <div class="content"><%= city.name %> 피드 <div class="sub header">다른 <%= city.name %> 여행자와 함께 정보를 공유해요.</div>
+  </div>
+</h2>
+
+<form class="ui form" method="post" action="/cities/<%= city.id %>/feed">
+<div class="ui fluid action input">
+    <input type="text" name="content" placeholder="피드 작성...">
+    <button class="ui submit button">올리기</button>
+</div>
+</form>
+
+<% feeds.forEach(function(feed){ %>
+  <a class="ui fluid card" href="/cities/<%= city.id %>/feeds/<%= feed.id %>">
+    <div class="content">
+      <img class="left floated mini ui image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg">
+      <div class="header"><%= feed.traveler.name %></div>
+      <div class="meta"><%= moment(feed.created_at).fromNow(); %></div>
+      <div class="description"><%= feed.content %></div>
+    </div>
+    <div class="content"><i class="comment icon"></i><%= feed.comments.length %> comments</div>
+  </a>
+<% }); %>
+
+<div class="ui pagination menu">
+  <% for ( var i = 1; i <= paging.pages; i++){ %>
+    <% if (paging.page == i) {%>
+      <a class="active item" href="/cities/<%= city.id %>?page=<%= i %>"><%= i %></a>
+    <% } else { %>
+      <a class="item" href="/cities/<%= city.id %>?page=<%= i %>"><%= i %></a>
+    <% } %>
+  <% } %>
+</div>
+
+
+<%- include('../partials/footer') -%>

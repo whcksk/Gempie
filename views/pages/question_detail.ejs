@@ -1,0 +1,63 @@
+<%- include('../partials/header') -%>
+<%- include('../partials/errors') -%>
+
+<h2 class="ui header">질문</h2>
+
+<a class="ui button" href="/pages/<%= page.id %>">Back</a>
+
+<div class="ui fluid card">
+  <div class="content">
+    <img class="left floated mini ui image" src="http://semantic-ui.com/images/avatar/large/elliot.jpg">
+    <div class="header">
+      <a class="author" href="/user/<%= question.writer.username %>"><%= question.writer.name %></a>
+      <% if (user && user.id == question.writer.id) { %>
+        <div class="ui top right attached label">
+          <a class="edit" href="/pages/<%= page.id %>/questions/<%= question.id %>/edit"><i class="pencil icon"></i></a>
+          <a class="delete" href="/pages/<%= page.id %>/questions/<%= question.id %>/delete"><i class="trash icon"></i></a>
+        </div>
+      <% } %>
+    </div>
+    <div class="meta"><%= moment(question.created_at).fromNow(); %></div>
+    <div class="text"><%= question.content %></div>
+  </div>
+</div>
+<div class="ui comments">
+  <h3 class="ui dividing header">Comments (<%= question.comments.length %>)</h3>
+      <% question.comments.forEach(function(comment){ %>
+        <div class="comment">
+          <a class="avatar">
+            <img src="http://semantic-ui.com/images/avatar/large/jenny.jpg">
+          </a>
+          <div class="content">
+            <a class="author" href="/user/<%= comment.writer.username %>"><b><%= comment.writer.name %></b></a>
+            <div class="metadata"><span class="date"><%= moment(comment.created_at).fromNow(); %></span></div>
+            <div class="text"><%= comment.content %></div>
+            <% if (user && user.id == comment.writer.id) {%>
+              <div class="action">
+              <a class="delete" href="/pages/<%= page.id %>/questions/<%= question.id %>/comments/<%= comment.id %>/delete">delete</a>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% });%>
+
+  <% if (user) { %>
+  <form class="ui form" method="post" action="/pages/<%= page.id %>/questions/<%= question.id %>">
+    <div class="field">
+      <textarea name="content" placeholder="Add comment here" required></textarea>
+    </div>
+    <button class="ui teal labeled submit icon button" type="submit">
+      <i class="icon edit"></i> Add Comment
+    </button>
+  </form>
+  <% } else { %>
+  <div class="ui bottom warning message">
+    <i class="warning icon"></i>
+    <a href="/auth/login">댓글을 작성하시려면 로그인이 필요합니다.</a>
+  </div>
+  <% } %>
+</div>
+
+
+
+<%- include('../partials/footer') -%>

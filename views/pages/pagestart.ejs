@@ -1,0 +1,36 @@
+<%- include('../partials/header') -%>
+<h2 class="ui header">
+  <i class="browser icon"></i>
+  <div class="content"><%= user.name %> 님의 페이지 목록
+  </div>
+</h2>
+
+<% if(typeof(pages) === "undefined"){ %>
+  <h4>현제 참여중인 페이지가 없습니다.</h4>
+  <h5><a href="/pages/makepage">하나 만드실?</a></h5>
+<% }else{ %>
+
+  <div class="ui link cards">
+  <% pages.forEach(function(page){ %>
+    <!-- 페이지 사이트로 이동  -->
+    <div class="card">
+        <a class="image">
+          <img src="/images/duck2.PNG" style="height:100px">
+        </a>
+        <div class="content">
+          <a class="header" href="/pages/<%= page.id %>"><%= page.name %></a>
+          <div class="meta">
+            <a>Page</a>
+          </div>
+          <div class="description">
+            페이지 설명
+          </div>
+        </div>
+      </div>
+    <!-- 페이지 : <b><a href="/pages/<%= page %>" ><%= page.name %></a></b><br> -->
+  <% }); %>
+  </div>
+  <h5><a href="/pages/makepage">페이지 추가</a></h5>
+<% } %>
+
+<%- include('../partials/footer') -%>
